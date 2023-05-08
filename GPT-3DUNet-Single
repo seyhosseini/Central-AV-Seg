@@ -33,7 +33,7 @@ class Down(nn.Module):
     def forward(self, x):
         return self.maxpool_conv(x)
 
-class Up(nn.Module):
+class Up(nn.Module): #
     def __init__(self, in_channels, out_channels, bilinear=True):
         super(Up, self).__init__()
         if bilinear:
@@ -45,7 +45,7 @@ class Up(nn.Module):
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
-        diffZ = x2.size()[2] - x1.size()[2]
+        diffZ = x2.size()[2] - x1.size()[2] # NCXYZ
         diffY = x2.size()[3] - x1.size()[3]
         diffX = x2.size()[4] - x1.size()[4]
         x1 = nn.functional.pad(x1, (diffX // 2, diffX - diffX // 2,
@@ -86,7 +86,7 @@ class UNet3D(nn.Module):
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x = self.up4(x, x1)
-        output = self.outc(x) #
+        output = self.outc(x)
         return output
 
 # Define your dataset class for loading CT images and masks
@@ -94,13 +94,13 @@ class UNet3D(nn.Module):
 class CTImageDataset(torch.utils.data.Dataset):
     def __init__(self, image_paths, mask_paths):
         self.image_paths = image_paths
-        self.mask_paths = mask_paths
+        self.mask_paths  = mask_paths
 
     def __getitem__(self, index):
         image = nib.load(self.image_paths[index]).get_fdata()
-        mask = nib.load(self.mask_paths[index]).get_fdata()
+        mask  = nib.load(self.mask_paths [index]).get_fdata()
         image = torch.from_numpy(image).unsqueeze(0).float()
-        mask = torch.from_numpy(mask).unsqueeze(0).float()
+        mask  = torch.from_numpy(mask ).unsqueeze(0).float()
         return image, mask
 
     def __len__(self):
@@ -108,18 +108,18 @@ class CTImageDataset(torch.utils.data.Dataset):
 
 # Define your training function
 
-def train(model, train_loader, criterion, optimizer, device):
-    model.train()
+def train(model, train_loader, criterion, optimizer, device): ###
+    model.train() ###
     running_loss = 0.0
 
     for images, masks in train_loader:
         images = images.to(device)
-        masks = masks.to(device)
+        masks  = masks .to(device)
 
         optimizer.zero_grad()
 
         outputs = model(images)
-        loss = criterion(outputs, masks)
+        loss = criterion(outputs, masks) ###
         loss.backward()
         optimizer.step()
 
@@ -129,10 +129,10 @@ def train(model, train_loader, criterion, optimizer, device):
 
 # Set your training parameters
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") ###
 epochs = 10
-batch_size = 4
-learning_rate = 0.001
+batch_size = 4 ###
+learning_rate = 0.001 ###
 
 # Create your model instance
 
