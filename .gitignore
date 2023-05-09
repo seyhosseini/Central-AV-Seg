@@ -10,3 +10,4 @@
 
 # Ignore image and mask files
 *.nrrd
+.venv/
