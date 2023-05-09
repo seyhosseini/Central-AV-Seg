@@ -146,7 +146,9 @@ model = model.to(device)
 
 # Create your dataset and data loader instances
 
-train_dataset = CTImageDataset(image_paths_train, mask_paths_train) ### Cases 43&36 ### M:1 A:2 V:3
+image_paths_train = ["Data\SPIROMCS-Case36-Vx3.nrrd", "Data\SPIROMCS-Case43-Vx3.nrrd"]
+mask_paths_train  = ["Data\SPIROMCS-Case36-012Labelmap.nrrd", "Data\SPIROMCS-Case43-012Labelmap.nrrd"]
+train_dataset = CTImageDataset(image_paths_train, mask_paths_train) ### Cases 43&36 ### M:1 A:2 V:3 > 012!
 train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True) ### Mask batch=1 channel=1 XYZ?
 
 # Define your loss function and optimizer
