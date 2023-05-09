@@ -10,4 +10,5 @@
 
 # Ignore image and mask files
 *.nrrd
+*.nii.gz
 .venv/
