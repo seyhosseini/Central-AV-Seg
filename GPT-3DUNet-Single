@@ -147,7 +147,7 @@ train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True) #
 # Define your loss function and optimizer
 
 criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate) # I'll see him for 5 minutes at 12
 
 # Start the training loop
 
