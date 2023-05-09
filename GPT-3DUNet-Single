@@ -62,7 +62,7 @@ class OutConv(nn.Module):
     def forward(self, x):
         return self.conv(x)
 
-class UNet3D(nn.Module):
+class UNet3D(nn.Module): ### Add dropout!
     def __init__(self, in_channels, out_channels):
         super(UNet3D, self).__init__()
         self.inc = DoubleConv(in_channels, 64)
@@ -127,12 +127,17 @@ def train(model, train_loader, criterion, optimizer, device): ###
 
     return running_loss / len(train_loader)
 
+
+
+
+
+
 # Set your training parameters
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu") ###
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") ####1
 epochs = 10
-batch_size = 4 ###
-learning_rate = 0.001 ###
+batch_size = 1 #4 ###
+learning_rate = 0.00001 #0.001 ###
 
 # Create your model instance
 
@@ -141,13 +146,13 @@ model = model.to(device)
 
 # Create your dataset and data loader instances
 
-train_dataset = CTImageDataset(image_paths_train, mask_paths_train)
+train_dataset = CTImageDataset(image_paths_train, mask_paths_train) ### Cases 43&36 ### M:1 A:2 V:3
 train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True) ### Mask batch=1 channel=1 XYZ?
 
 # Define your loss function and optimizer
 
-criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate) # I'll see him for 5 minutes at 12
+criterion = nn.MSELoss() ####
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 # Start the training loop
 
@@ -157,5 +162,7 @@ for epoch in range(epochs):
 
 # Save the trained model
 
-torch.save(model.state_dict(), "model.pth")
+torch.save(model.state_dict(), "model.pth") ###
 
+
+# model.eval()
