@@ -132,12 +132,13 @@ def train(model, train_loader, criterion, optimizer, device): ###
 
 
 
+
 # Set your training parameters
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") ####1
 epochs = 10
 batch_size = 1 #4 ###
-learning_rate = 0.00001 #0.001 ###
+learning_rate = 0.0001 #0.001 ###
 
 # Create your model instance
 
@@ -149,12 +150,12 @@ model = model.to(device)
 image_paths_train = ["Data\SPIROMCS-Case36-Vx3.nrrd", "Data\SPIROMCS-Case43-Vx3.nrrd"]
 mask_paths_train  = ["Data\SPIROMCS-Case36-012Labelmap.nrrd", "Data\SPIROMCS-Case43-012Labelmap.nrrd"]
 train_dataset = CTImageDataset(image_paths_train, mask_paths_train) ### Cases 43&36 ### M:1 A:2 V:3 > 012!
-train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=True) ### Mask batch=1 channel=1 XYZ?
+train_loader  = DataLoader(train_dataset, batch_size=batch_size, shuffle=False) ### Mask: B=1?C=1?XYZ? #shuffle=True
 
 # Define your loss function and optimizer
 
-criterion = nn.MSELoss() ####
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+criterion = nn.CrossEntropyLoss() ####2 ignore_index (int, optional) ***
+optimizer = optim.Adam(model.parameters(), lr=learning_rate) ###
 
 # Start the training loop
 
@@ -168,3 +169,5 @@ torch.save(model.state_dict(), "model.pth") ###
 
 
 # model.eval()
+# for batch_idx, (inputs, targets) in enumerate(train_dataloader):
+# nn.CrossEntropyLoss(): label_smoothing=0.0?!!
