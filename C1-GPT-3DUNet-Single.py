@@ -1,3 +1,4 @@
+print("Importing ...")
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -8,6 +9,7 @@ import numpy as np
 import random
 
 # Define your model architecture here
+print("Defining Classes ...")
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -139,7 +141,7 @@ class CTImageDataset(torch.utils.data.Dataset): ###
         image = nib.load(self.image_paths[index]).get_fdata()
         mask  = nib.load(self.mask_paths [index]).get_fdata()
         image = torch.from_numpy(image) .unsqueeze(0).float() ### 1-Channel?!
-        mask  = torch.from_numpy(mask ) .unsqueeze(0).long()
+        mask  = torch.from_numpy(mask ) .unsqueeze(0).long() ### Changed!
         return image, mask
 
     def __len__(self):
@@ -151,7 +153,9 @@ def train(model, train_loader, criterion, optimizer, device): ###
     model.train() ###
     running_loss = 0.0
 
-    for images, masks in train_loader:
+    for batch_idx, (images, masks) in enumerate(train_loader):
+        # print(f"Batch {batch_idx+1} Started")
+
         images = images.to(device)
         masks  = masks .to(device)
 
@@ -161,13 +165,17 @@ def train(model, train_loader, criterion, optimizer, device): ###
         optimizer.zero_grad()
 
         # Forward pass
+        # print("Passing through Model ...")
         outputs = model(images)
 
         # Compute loss
+        # print("CrossEnthropy() ...")
         loss = criterion(outputs, torch.squeeze(masks, dim=1)) ###
 
         # Backward pass and optimization
+        # print("Backward ...")
         loss.backward()
+        # print("Step ...")
         optimizer.step()
 
         running_loss += loss.item()
@@ -180,6 +188,7 @@ def train(model, train_loader, criterion, optimizer, device): ###
 
 
 # Set your training parameters
+print("Setting Parameters & Instanciating ...")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") ####1
 epochs = 10
@@ -204,6 +213,7 @@ criterion = nn.CrossEntropyLoss() ####2 ignore_index (int, optional) ***
 optimizer = optim.Adam(model.parameters(), lr=learning_rate) ###
 
 # Start the training loop
+print("Start Training ...")
 
 for epoch in range(epochs):
     train_loss = train(model, train_loader, criterion, optimizer, device) ########
@@ -215,5 +225,5 @@ torch.save(model.state_dict(), "model.pth") ###
 
 
 # model.eval()
-# for batch_idx, (inputs, targets) in enumerate(train_dataloader):
+# for images, masks in train_loader:
 # nn.CrossEntropyLoss(): label_smoothing=0.0?!!
