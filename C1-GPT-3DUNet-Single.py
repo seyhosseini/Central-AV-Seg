@@ -2,9 +2,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from   torch.utils.data import DataLoader
-import torchvision.transforms as transforms
+import torchvision.transforms as transforms # Using TorchIO may help in 3D augmentation *
 import nibabel as nib
 import numpy as np
+import random
 
 # Define your model architecture here
 
@@ -90,13 +91,42 @@ class UNet3D(nn.Module): ### Add dropout!
         output = self.outc(x)
         return output
 
-# Define the transforms
 
+# Define a custom transform class for applying the same random crop
+class RandomCrop3D:
+    def __init__(self, output_size):
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        inputs, targets = sample
+
+        # Get the input size
+        input_size = inputs.shape[1:]
+
+        # Calculate the starting index for the crop
+        start_indexes = [random.randint(0, input_size[i] - self.output_size[i]) for i in range(3)]
+
+        # Perform the crop on both inputs and targets
+        inputs = inputs[:, start_indexes[0]:start_indexes[0] + self.output_size[0], 
+                        start_indexes[1]:start_indexes[1] + self.output_size[1],
+                        start_indexes[2]:start_indexes[2] + self.output_size[2]]
+
+        targets = targets[:, start_indexes[0]:start_indexes[0] + self.output_size[0], 
+                          start_indexes[1]:start_indexes[1] + self.output_size[1],
+                          start_indexes[2]:start_indexes[2] + self.output_size[2]]
+
+        return inputs, targets
+
+# Define the output size for random cropping
+output_size = (128, 128, 128)
+
+# Define the transforms
 transform = transforms.Compose([
-    transforms.RandomCrop((128, 128, 128)),  # Random crop to size (128, 128, 128)
-    # transforms.RandomVerticalFlip(),         # Random vertical flipping
-    # transforms.RandomHorizontalFlip()         # Random horizontal flipping
+    RandomCrop3D(output_size),              # Custom random crop
+    # transforms.RandomVerticalFlip(),        # Random vertical flipping
+    # transforms.RandomHorizontalFlip()        # Random horizontal flipping
 ])
+
 
 # Define your dataset class for loading CT images and masks
 
@@ -125,7 +155,7 @@ def train(model, train_loader, criterion, optimizer, device): ###
         images = images.to(device)
         masks  = masks .to(device)
 
-        # Apply transforms to the inputs and targets        
+        # Apply transforms to the inputs and targets
         images, masks = transform((images, masks))
 
         optimizer.zero_grad()
@@ -143,7 +173,6 @@ def train(model, train_loader, criterion, optimizer, device): ###
         running_loss += loss.item()
 
     return running_loss / len(train_loader)
-
 
 
 
