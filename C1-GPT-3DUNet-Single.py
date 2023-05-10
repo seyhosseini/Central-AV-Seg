@@ -139,7 +139,7 @@ class CTImageDataset(torch.utils.data.Dataset): ###
         image = nib.load(self.image_paths[index]).get_fdata()
         mask  = nib.load(self.mask_paths [index]).get_fdata()
         image = torch.from_numpy(image) .unsqueeze(0).float() ### 1-Channel?!
-        mask  = torch.from_numpy(mask ) .unsqueeze(0).float()
+        mask  = torch.from_numpy(mask ) .unsqueeze(0).long()
         return image, mask
 
     def __len__(self):
@@ -164,7 +164,7 @@ def train(model, train_loader, criterion, optimizer, device): ###
         outputs = model(images)
 
         # Compute loss
-        loss = criterion(outputs, masks) ###
+        loss = criterion(outputs, torch.squeeze(masks, dim=1)) ###
 
         # Backward pass and optimization
         loss.backward()
