@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from   torch.utils.data import DataLoader
+import torchvision.transforms as transforms
 import nibabel as nib
 import numpy as np
 
@@ -89,6 +90,14 @@ class UNet3D(nn.Module): ### Add dropout!
         output = self.outc(x)
         return output
 
+# Define the transforms
+
+transform = transforms.Compose([
+    transforms.RandomCrop((128, 128, 128)),  # Random crop to size (128, 128, 128)
+    # transforms.RandomVerticalFlip(),         # Random vertical flipping
+    # transforms.RandomHorizontalFlip()         # Random horizontal flipping
+])
+
 # Define your dataset class for loading CT images and masks
 
 class CTImageDataset(torch.utils.data.Dataset): ###
@@ -116,10 +125,18 @@ def train(model, train_loader, criterion, optimizer, device): ###
         images = images.to(device)
         masks  = masks .to(device)
 
+        # Apply transforms to the inputs and targets        
+        images, masks = transform((images, masks))
+
         optimizer.zero_grad()
 
+        # Forward pass
         outputs = model(images)
+
+        # Compute loss
         loss = criterion(outputs, masks) ###
+
+        # Backward pass and optimization
         loss.backward()
         optimizer.step()
 
