@@ -93,7 +93,7 @@ class UNet3D(nn.Module): ### Add dropout!
 
 
 # Define a custom transform class for applying the same random crop
-class RandomCrop3D:
+class RandomCrop3D: ###
     def __init__(self, output_size):
         self.output_size = output_size
 
@@ -101,19 +101,19 @@ class RandomCrop3D:
         inputs, targets = sample
 
         # Get the input size
-        input_size = inputs.shape[1:]
+        input_size = inputs.shape[2:] ###
 
         # Calculate the starting index for the crop
         start_indexes = [random.randint(0, input_size[i] - self.output_size[i]) for i in range(3)]
 
         # Perform the crop on both inputs and targets
-        inputs = inputs[:, start_indexes[0]:start_indexes[0] + self.output_size[0], 
-                        start_indexes[1]:start_indexes[1] + self.output_size[1],
-                        start_indexes[2]:start_indexes[2] + self.output_size[2]]
+        inputs  = inputs [:,:, start_indexes[0]:start_indexes[0] + self.output_size[0], 
+                               start_indexes[1]:start_indexes[1] + self.output_size[1],
+                               start_indexes[2]:start_indexes[2] + self.output_size[2]]
 
-        targets = targets[:, start_indexes[0]:start_indexes[0] + self.output_size[0], 
-                          start_indexes[1]:start_indexes[1] + self.output_size[1],
-                          start_indexes[2]:start_indexes[2] + self.output_size[2]]
+        targets = targets[:,:, start_indexes[0]:start_indexes[0] + self.output_size[0], 
+                               start_indexes[1]:start_indexes[1] + self.output_size[1],
+                               start_indexes[2]:start_indexes[2] + self.output_size[2]]
 
         return inputs, targets
 
@@ -206,7 +206,7 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate) ###
 # Start the training loop
 
 for epoch in range(epochs):
-    train_loss = train(model, train_loader, criterion, optimizer, device)
+    train_loss = train(model, train_loader, criterion, optimizer, device) ########
     print(f"Epoch {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}")
 
 # Save the trained model
