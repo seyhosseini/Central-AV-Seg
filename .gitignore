@@ -13,3 +13,5 @@
 *.nii.gz
 *.pth
 .venv/
+.venv2/
+.venv3pip/
